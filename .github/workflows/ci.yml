@@ -36,6 +36,11 @@ jobs:
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/
+          
+      - name: Run tests
+        run: |
+          npx playwright install --with-deps chromium
+          npm run test:coverage
   deploy:
     needs: build
     permissions:
