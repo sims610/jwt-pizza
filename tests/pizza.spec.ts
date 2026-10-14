@@ -49,6 +49,11 @@ async function basicInit(page: Page) {
     await route.fulfill({ json: loggedInUser });
   });
 
+  await page.route(/\/api\/user\?.*$/, async (route) => {
+    expect(route.request().method()).toBe('GET');
+    await route.fulfill({ json: { users: Object.values(validUsers), more: false } });
+  });
+
   await page.route('*/**/api/order/menu', async (route) => {
     const menuRes = [
       { id: 1, title: 'Veggie', image: 'pizza1.png', price: 0.0038, description: 'A garden of delight' },
@@ -203,7 +208,7 @@ test('admin login', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'PA', exact: true })).toBeVisible();
   await page.getByRole('link', { name: 'Admin' }).click();
   await expect(page.getByText("Mama Ricci's kitchen")).toBeVisible();
-  await expect(page.getByRole('table')).toContainText('LotaPizza');
+  await expect(page.getByRole('table').first()).toContainText('LotaPizza');
 });
 
 test('franchise login', async ({ page }) => {
@@ -274,8 +279,8 @@ test('create franchise', async ({ page }) => {
   await page.getByRole('button', { name: 'Create' }).click();
 
   await expect(page.getByText("Mama Ricci's kitchen")).toBeVisible();
-  await expect(page.getByRole('table')).toContainText('SLC');
-  await expect(page.getByRole('table')).toContainText('Pizza Franchisee');
+  await expect(page.getByRole('table').first()).toContainText('SLC');
+  await expect(page.getByRole('table').first()).toContainText('Pizza Franchisee');
 });
 
 test('register', async ({ page }) => {
